@@ -13,6 +13,9 @@
 
 ActiveRecord::Schema.define(version: 20180925061229) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "members", force: :cascade do |t|
     t.integer  "tenant_id"
     t.integer  "user_id"
@@ -22,8 +25,8 @@ ActiveRecord::Schema.define(version: 20180925061229) do
     t.datetime "updated_at", null: false
   end
 
-  add_index "members", ["tenant_id"], name: "index_members_on_tenant_id"
-  add_index "members", ["user_id"], name: "index_members_on_user_id"
+  add_index "members", ["tenant_id"], name: "index_members_on_tenant_id", using: :btree
+  add_index "members", ["user_id"], name: "index_members_on_user_id", using: :btree
 
   create_table "sessions", force: :cascade do |t|
     t.string   "session_id", null: false
@@ -32,8 +35,8 @@ ActiveRecord::Schema.define(version: 20180925061229) do
     t.datetime "updated_at"
   end
 
-  add_index "sessions", ["session_id"], name: "index_sessions_on_session_id", unique: true
-  add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at"
+  add_index "sessions", ["session_id"], name: "index_sessions_on_session_id", unique: true, using: :btree
+  add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
 
   create_table "tenants", force: :cascade do |t|
     t.integer  "tenant_id"
@@ -42,15 +45,15 @@ ActiveRecord::Schema.define(version: 20180925061229) do
     t.datetime "updated_at", null: false
   end
 
-  add_index "tenants", ["name"], name: "index_tenants_on_name"
-  add_index "tenants", ["tenant_id"], name: "index_tenants_on_tenant_id"
+  add_index "tenants", ["name"], name: "index_tenants_on_name", using: :btree
+  add_index "tenants", ["tenant_id"], name: "index_tenants_on_tenant_id", using: :btree
 
   create_table "tenants_users", id: false, force: :cascade do |t|
     t.integer "tenant_id", null: false
     t.integer "user_id",   null: false
   end
 
-  add_index "tenants_users", ["tenant_id", "user_id"], name: "index_tenants_users_on_tenant_id_and_user_id"
+  add_index "tenants_users", ["tenant_id", "user_id"], name: "index_tenants_users_on_tenant_id_and_user_id", using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "email",                        default: "",    null: false
@@ -73,8 +76,11 @@ ActiveRecord::Schema.define(version: 20180925061229) do
     t.datetime "updated_at",                                   null: false
   end
 
-  add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
-  add_index "users", ["email"], name: "index_users_on_email", unique: true
-  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+  add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
+  add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
+  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
+  add_foreign_key "members", "tenants"
+  add_foreign_key "members", "users"
+  add_foreign_key "tenants", "tenants"
 end
